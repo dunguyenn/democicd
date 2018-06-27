@@ -1,0 +1,30 @@
+version: '2'
+services:
+    nginx:
+        image: namptit307/url-shortener-nginx
+        ports:
+            - "8888:80"
+        restart: always
+        links:
+            - app
+    app:
+        image: namptit307/url-shortener-app
+        expose:
+            - "8000"
+        restart: always
+        links:
+            - postgres
+        env_file:
+            - ./.env
+        depends_on:
+            - postgres
+
+    postgres:
+        image: namptit307/url-shortener-db
+        env_file:
+            - ./.env
+        restart: always
+        volumes:
+            - ./pg:/var/lib/postgres/data/
+        expose:
+            - "5432"
