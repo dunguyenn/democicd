@@ -128,5 +128,5 @@ pipeline:
   #     status: [ failure, success ]
 
   services:
-  postgres:
-    image: hocchudong/url-shortener-db
+    postgres:
+      image: hocchudong/url-shortener-db
