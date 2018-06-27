@@ -1,14 +1,14 @@
 version: '2'
 services:
     nginx:
-        image: namptit307/url-shortener-nginx
+        image: hocchudong/url-shortener-nginx
         ports:
             - "8888:80"
         restart: always
         links:
             - app
     app:
-        image: namptit307/url-shortener-app
+        image: hocchudong/url-shortener-app
         expose:
             - "8000"
         restart: always
@@ -20,7 +20,7 @@ services:
             - postgres
 
     postgres:
-        image: namptit307/url-shortener-db
+        image: hocchudong/url-shortener-db
         env_file:
             - ./.env
         restart: always
