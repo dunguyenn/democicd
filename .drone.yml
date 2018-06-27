@@ -1,4 +1,8 @@
 pipeline:
+  services:
+    postgres:
+      image: hocchudong/url-shortener-db
+
   test:
     image: python:3.6
     environment:
@@ -126,7 +130,3 @@ pipeline:
   #   secrets: [ slack_webhook, plugin_username ]
   #   when:
   #     status: [ failure, success ]
-
-  services:
-    postgres:
-      image: hocchudong/url-shortener-db
