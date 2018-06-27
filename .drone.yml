@@ -1,3 +1,7 @@
+services:
+  postgres:
+    image: hocchudong/url-shortener-db
+
 pipeline:
   test:
     image: python:3.6
