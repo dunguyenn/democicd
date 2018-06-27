@@ -19,7 +19,7 @@ pipeline:
   release-app-latest:
     group: release-latest
     image: plugins/docker:17.10
-    repo: namptit307/url-shortener-app
+    repo: hocchudong/url-shortener-app
     dockerfile: app/Dockerfile
     context: app
     secrets: [ docker_username, docker_password ]
@@ -32,7 +32,7 @@ pipeline:
   release-db-latest:
     group: release-latest
     image: plugins/docker:17.10
-    repo: namptit307/url-shortener-db
+    repo: hocchudong/url-shortener-db
     dockerfile: sql/Dockerfile
     context: sql
     secrets: [ docker_username, docker_password ]
@@ -45,7 +45,7 @@ pipeline:
   release-nginx-latest:
     group: release-latest
     image: plugins/docker:17.10
-    repo: namptit307/url-shortener-nginx
+    repo: hocchudong/url-shortener-nginx
     dockerfile: nginx.Dockerfile
     secrets: [ docker_username, docker_password ]
     tag: latest
@@ -57,7 +57,7 @@ pipeline:
   release-app-tag:
     group: release-tag
     image: plugins/docker:17.10
-    repo: namptit307/url-shortener-app
+    repo: hocchudong/url-shortener-app
     dockerfile: app/Dockerfile
     context: app
     secrets: [ docker_username, docker_password ]
@@ -68,7 +68,7 @@ pipeline:
   release-db-tag:
     group: release-tag
     image: plugins/docker:17.10
-    repo: namptit307/url-shortener-db
+    repo: hocchudong/url-shortener-db
     dockerfile: sql/Dockerfile
     context: sql
     secrets: [ docker_username, docker_password ]
@@ -79,7 +79,7 @@ pipeline:
   release-nginx-tag:
     group: release-tag
     image: plugins/docker:17.10
-    repo: namptit307/url-shortener-nginx
+    repo: hocchudong/url-shortener-nginx
     dockerfile: nginx.Dockerfile
     secrets: [ docker_username, docker_password ]
     auto_tag: true
@@ -116,7 +116,6 @@ pipeline:
     when:
       event: [ tag ]
 
-
   telegram:
     image: appleboy/drone-telegram
     message: >
@@ -129,19 +128,19 @@ pipeline:
     when:
       status: [ failure, success ]
 
-  slack:
-    image: plugins/slack
-    icon_emoji: ":ghost:"
-    template: >
-      {{#success build.status}}
-        build {{build.number}} succeeded. Good job.
-      {{else}}
-        build {{build.number}} failed. Fix me please.
-      {{/success}}
-    secrets: [ slack_webhook, plugin_username ]
-    when:
-      status: [ failure, success ]
+  # slack:
+  #   image: plugins/slack
+  #   icon_emoji: ":ghost:"
+  #   template: >
+  #     {{#success build.status}}
+  #       build {{build.number}} succeeded. Good job.
+  #     {{else}}
+  #       build {{build.number}} failed. Fix me please.
+  #     {{/success}}
+  #   secrets: [ slack_webhook, plugin_username ]
+  #   when:
+  #     status: [ failure, success ]
 
 services:
   postgres:
-    image: namptit307/url-shortener-db
+    image: hocchudong/url-shortener-db
