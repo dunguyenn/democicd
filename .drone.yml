@@ -92,7 +92,7 @@ pipeline:
     command_timeout: 180
     secrets: [ ssh_host, ssh_password ]
     script:
-      - cd /opt/deployment/test/sanic-url-shortener
+      - cd /opt/deployment/test/democicd
       - docker-compose stop
       - docker-compose down --rmi all
       - docker-compose pull
@@ -107,7 +107,7 @@ pipeline:
     command_timeout: 180
     secrets: [ ssh_host, ssh_password ]
     script:
-      - cd /opt/deployment/staging/sanic-url-shortener
+      - cd /opt/deployment/staging/democicd
       - docker-compose stop
       - docker-compose down --rmi all
       - docker-compose pull
