@@ -140,7 +140,3 @@ pipeline:
   #   secrets: [ slack_webhook, plugin_username ]
   #   when:
   #     status: [ failure, success ]
-
-services:
-  postgres:
-    image: hocchudong/url-shortener-db
