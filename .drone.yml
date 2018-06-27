@@ -1,0 +1,147 @@
+pipeline:
+  test:
+    image: python:3.6
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=url
+      - POSTGRES_PASSWORD=secret
+    commands:
+      - pip install pipenv
+      - cd app
+      - pipenv install --system
+      - python app.py &
+      - sleep 5
+      - "curl -s localhost:8000/health | grep 'true'"
+    when:
+      branch: [ master ]
+      event: [ pull_request ]
+
+  release-app-latest:
+    group: release-latest
+    image: plugins/docker:17.10
+    repo: namptit307/url-shortener-app
+    dockerfile: app/Dockerfile
+    context: app
+    secrets: [ docker_username, docker_password ]
+    tag: latest
+    when:
+      branch: [ master ]
+      event:
+        exclude: [ pull_request ]
+
+  release-db-latest:
+    group: release-latest
+    image: plugins/docker:17.10
+    repo: namptit307/url-shortener-db
+    dockerfile: sql/Dockerfile
+    context: sql
+    secrets: [ docker_username, docker_password ]
+    tag: latest
+    when:
+      branch: [ master ]
+      event:
+        exclude: [ pull_request ]
+
+  release-nginx-latest:
+    group: release-latest
+    image: plugins/docker:17.10
+    repo: namptit307/url-shortener-nginx
+    dockerfile: nginx.Dockerfile
+    secrets: [ docker_username, docker_password ]
+    tag: latest
+    when:
+      branch: [ master ]
+      event:
+        exclude: [ pull_request ]
+
+  release-app-tag:
+    group: release-tag
+    image: plugins/docker:17.10
+    repo: namptit307/url-shortener-app
+    dockerfile: app/Dockerfile
+    context: app
+    secrets: [ docker_username, docker_password ]
+    auto_tag: true
+    when:
+      event: [ tag ]
+
+  release-db-tag:
+    group: release-tag
+    image: plugins/docker:17.10
+    repo: namptit307/url-shortener-db
+    dockerfile: sql/Dockerfile
+    context: sql
+    secrets: [ docker_username, docker_password ]
+    auto_tag: true
+    when:
+      event: [ tag ]
+
+  release-nginx-tag:
+    group: release-tag
+    image: plugins/docker:17.10
+    repo: namptit307/url-shortener-nginx
+    dockerfile: nginx.Dockerfile
+    secrets: [ docker_username, docker_password ]
+    auto_tag: true
+    when:
+      event: [ tag ]
+
+  deploy-test:
+    image: appleboy/drone-ssh
+    username: root
+    command_timeout: 180
+    secrets: [ ssh_host, ssh_password ]
+    script:
+      - cd /opt/deployment/test/sanic-url-shortener
+      - docker-compose stop
+      - docker-compose down --rmi all
+      - docker-compose pull
+      - docker-compose up --build -d
+    when:
+      branch: [ master ]
+      event: [ push ]
+
+  deploy-staging:
+    image: appleboy/drone-ssh
+    username: root
+    command_timeout: 180
+    secrets: [ ssh_host, ssh_password ]
+    script:
+      - cd /opt/deployment/staging/sanic-url-shortener
+      - docker-compose stop
+      - docker-compose down --rmi all
+      - docker-compose pull
+      - sed -Ei "s/^STAGING_TAG.+/STAGING_TAG=${DRONE_TAG}/g" .env
+      - docker-compose up --build -d
+    when:
+      event: [ tag ]
+
+
+  telegram:
+    image: appleboy/drone-telegram
+    message: >
+      {{#success build.status}}
+        build {{build.number}}({{build.link}}) succeeded.
+      {{else}}
+        build {{build.number}}({{build.link}}) failed. Fix me please.
+      {{/success}}
+    secrets: [ telegram_token, telegram_to ]
+    when:
+      status: [ failure, success ]
+
+  slack:
+    image: plugins/slack
+    icon_emoji: ":ghost:"
+    template: >
+      {{#success build.status}}
+        build {{build.number}} succeeded. Good job.
+      {{else}}
+        build {{build.number}} failed. Fix me please.
+      {{/success}}
+    secrets: [ slack_webhook, plugin_username ]
+    when:
+      status: [ failure, success ]
+
+services:
+  postgres:
+    image: namptit307/url-shortener-db
