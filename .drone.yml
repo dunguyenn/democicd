@@ -86,13 +86,13 @@ pipeline:
     when:
       event: [ tag ]
 
-  deploy-test:
+  deploy-staging:
     image: appleboy/drone-ssh
     username: root
     command_timeout: 180
     secrets: [ ssh_host, ssh_password ]
     script:
-      - cd /opt/deployment/test/democicd
+      - cd /opt/deployment/democicd
       - docker-compose stop
       - docker-compose down --rmi all
       - docker-compose pull
@@ -100,21 +100,6 @@ pipeline:
     when:
       branch: [ master ]
       event: [ push ]
-
-  deploy-staging:
-    image: appleboy/drone-ssh
-    username: root
-    command_timeout: 180
-    secrets: [ ssh_host, ssh_password ]
-    script:
-      - cd /opt/deployment/staging/democicd
-      - docker-compose stop
-      - docker-compose down --rmi all
-      - docker-compose pull
-      - sed -Ei "s/^STAGING_TAG.+/STAGING_TAG=${DRONE_TAG}/g" .env
-      - docker-compose up --build -d
-    when:
-      event: [ tag ]
 
   telegram:
     image: appleboy/drone-telegram
