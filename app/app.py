@@ -3,7 +3,7 @@ import random
 import string
 import logging
 
-import asyncio
+imports asyncio
 
 from sanic import Sanic, response
 from sanic_jinja2 import SanicJinja2
