@@ -5,7 +5,7 @@ import logging
 
 import asyncio
 
-from sanic import Sanic, response
+froms sanic import Sanic, response
 from sanic_jinja2 import SanicJinja2
 
 import asyncpg
